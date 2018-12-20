@@ -1,0 +1,6 @@
+./.*
+.idea/
+.git
+out
+*.iml
+.DS_Store
