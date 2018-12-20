@@ -2,15 +2,16 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
-import com.sun.tools.corba.se.idl.Util.getAbsolutePath
 import javax.swing.JFrame
 import java.awt.FileDialog
 import kotlin.system.exitProcess
 
 
-const val LENGTH = 6.0
+const val LENGTH = 16.0
 val LENGTH_DIGITS: Int = maxBinaryDigits(LENGTH)
 val LENGTH_DIVISOR = 1 shl LENGTH_DIGITS
+
+fun lengthModifier(v: Double) = Math.sqrt(v/ LENGTH) * LENGTH
 
 fun maxBinaryDigits(n: Double) = maxBinaryDigits(Math.ceil(n).toInt())
 fun maxBinaryDigits(n: Int) : Int {
@@ -29,18 +30,11 @@ fun main(args: Array<String>) {
     fd.isVisible = true
     val f = fd.files.first()
 
-    // val input = args.getOrElse(0) {
-    //    "./Archiv.zip"
-    // }
-
-
-
-    // val f = File(input).readBytes()
-
     val iter = BoolIterator(f.readBytes())
-
+    println("Read File into Memory")
     val points = mutableListOf<Pair<Point, Color>>()
-
+    var count = 0
+    var x = 10000
     try {
         var current = Point(0.0, 0.0)
         while (true) {
@@ -52,20 +46,29 @@ fun main(args: Array<String>) {
 
             points.add(next to col)
             current = next
+            count++
+            if (--x == 0) {
+                x = 10000
+                println("read ($count) Points")
+            }
+
+            iter.getInteger(23)
         }
     } catch (e: Exception) {
-        val img = renderPoints(points)
-        try {
-            val output = args.getOrElse(1) {
-                "./output.png"
-            }
-            ImageIO.write(img, "png", File(output))
-            exitProcess(1)
-        } catch (e: IOException) {
-            println("Failed to write Image")
-            exitProcess(0)
-        }
+        println("Finished deserializing File")
+        println("read ($count) Points")
+        renderImage(points)
+    }
+}
 
+fun renderImage(points: List<Pair<Point, Color>>) {
+    val img = renderPoints(points)
+    try {
+        ImageIO.write(img, "png", File("./output.png"))
+        exitProcess(1)
+    } catch (e: IOException) {
+        println("Failed to write Image")
+        exitProcess(0)
     }
 }
 
@@ -75,20 +78,21 @@ fun renderPoints(list: List<Pair<Point, Color>>) : BufferedImage {
 
     val points =
         list
-            .map { it.first.moveDown(-minDown).moveRight(-minRight) }
+            .map { it.first.moveDown(-minDown).moveRight(-minRight).mul(0.2)}
             .toMutableList()
     val colors =
         list
             .map { it.second }
             .toMutableList()
 
-    val width = points.map {it.x}.max()!!
-    val height = points.map {it.y}.max()!!
-
+    val width = points.map {it.x}.max()!!.toInt()+1
+    val height = points.map {it.y}.max()!!.toInt()+1
+    println("($width, $height)")
     //val img = Image(Math.ceil(width).toInt()+1, Math.ceil(height).toInt()+1)
 
-    val img = BufferedImage(Math.ceil(width).toInt(), Math.ceil(height).toInt(), BufferedImage.TYPE_INT_RGB)
+    val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
 
+    println("Sucessfully Allocated Image")
     var currentPoint = points.removeAt(0)
     var currentColor = colors.removeAt(0)
 
