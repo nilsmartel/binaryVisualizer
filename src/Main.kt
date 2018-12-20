@@ -85,9 +85,9 @@ fun renderPoints(list: List<Pair<Point, Color>>) : BufferedImage {
     val width = points.map {it.x}.max()!!
     val height = points.map {it.y}.max()!!
 
-    val img = Image(Math.ceil(width).toInt()+1, Math.ceil(height).toInt()+1)
+    //val img = Image(Math.ceil(width).toInt()+1, Math.ceil(height).toInt()+1)
 
-    // val img = Image(1024, 1024)
+    val img = BufferedImage(Math.ceil(width).toInt(), Math.ceil(height).toInt(), BufferedImage.TYPE_INT_RGB)
 
     var currentPoint = points.removeAt(0)
     var currentColor = colors.removeAt(0)
@@ -97,14 +97,15 @@ fun renderPoints(list: List<Pair<Point, Color>>) : BufferedImage {
 
         val colorIter = TransitionIterator(currentColor, pair.second, steps)
         for (p in TransitionIterator(currentPoint, pair.first, steps)) {
-            img.setColor(p.toFixed(), colorIter.next())
+            val px = p.toFixed()
+            img.setRGB(px.x, px.y, colorIter.next().toInt())
         }
 
         currentPoint = pair.first
         currentColor = pair.second
     }
 
-    return img.toImage()
+    return img
 }
 
 
