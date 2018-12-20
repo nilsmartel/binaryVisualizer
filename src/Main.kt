@@ -5,7 +5,7 @@ import javax.imageio.ImageIO
 import com.sun.tools.corba.se.idl.Util.getAbsolutePath
 import javax.swing.JFrame
 import java.awt.FileDialog
-
+import kotlin.system.exitProcess
 
 
 const val LENGTH = 6.0
@@ -59,10 +59,13 @@ fun main(args: Array<String>) {
             val output = args.getOrElse(1) {
                 "./output.png"
             }
-            ImageIO.write(img, "png", File(output));
+            ImageIO.write(img, "png", File(output))
+            exitProcess(1)
         } catch (e: IOException) {
             println("Failed to write Image")
+            exitProcess(0)
         }
+
     }
 }
 
