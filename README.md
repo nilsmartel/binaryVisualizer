@@ -1,6 +1,6 @@
 # Binary File Visualizer
 
-simple algorithm, reading a File bit by bit and rendering an Image out of it
+This programm is supposed to compose an abstract image from the bits of any file.
 
 ## Example:
 
